@@ -4,10 +4,10 @@
 **Caveat's:** This code was written on MS windows 7 pro. I should run without modification in Linux, bus since my Linux box is currently down, hasn't been tested on that OS nor has it been tested on OS-X.
 
 **Goal:** To build a file record format, for immutable data (once written), that would transferable between python and other computer languages. Allow for python names like
-**
-stkmktrec.dbtabledesc
-stkmktrec.columns[0].db_column_name.
-**
+
+
+**```stkmktrec.dbtabledesc```**
+**```stkmktrec.columns[0].db_column_name```**
 
 Here's a sample of how used:
 
