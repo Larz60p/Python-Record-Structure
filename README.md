@@ -11,6 +11,16 @@
 
 Here's a sample of how used:
 
+**To read data:**
+```
+class ShowData:
+    def __init__(self):
+        self.rr = RdRec.ReadRecord('StockData.json')
+        self.stock_market_record = self.rr.read_data_file()
+```
+
+**To display parts of the record:**
+
 ```
     def show_data(self):
         stkmktrec = self.stock_market_record
