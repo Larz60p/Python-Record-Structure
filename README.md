@@ -3,9 +3,6 @@
 
 **Caveat's:** This code was written on MS windows 7 pro. I should run without modification in Linux, bus since my Linux box is currently down, hasn't been tested on that OS nor has it been tested on OS-X.
 
-**Goal:** To build a file record format, for immutable data (once written), that would transferable between python and other computer languages. Allow for python names like
-
-
 **```stkmktrec.dbtabledesc```**
 **```stkmktrec.columns[0].db_column_name```**
 
@@ -89,7 +86,7 @@ Using get_field_item - Column 1, db_column_desc: None
 With bad data you get: None
 ```
 
-
+**Goal:** To build a file record format, for immutable data (once written), that would transferable between python and other computer languages. Allow for python names like
 
 1 - Be Textual, allowing for human-readable collection of data that we can access in a really logical manner
 
