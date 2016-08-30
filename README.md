@@ -3,8 +3,25 @@
 
 **Caveat's:** This code was written on MS windows 7 pro. It should run without modification in Linux, but since my Linux box is currently down, hasn't been tested on that OS nor has it been tested on OS-X.
 
+**Goal:** To build a file record format, for immutable data (once written), that would be transferable between python and other computer languages. Allow for python names like:
+
 **```stkmktrec.dbtabledesc```**
 **```stkmktrec.columns[0].db_column_name```**
+
+1 - Be Textual, allowing for human-readable collection of data that we can access in a really logical manner
+
+2 - Be simple to design, read and write
+
+3 - Be easily converted to an existing built-in python data type
+
+4 - Be self-documenting so that reading the python script would immediately indicate what the data element was.
+
+Solutions:
+  1 Be Textual and use a format understood by other non-python programs. This was easy, JSON already exists and is ready as is.
+
+  2 Be simple to design, read and write – Again easy using a python dictionary structure, in combination with python list for the repeated parts of a record design.
+
+  3, 4  Be easily converted to an existing built-in python data type. Reading JSON into a python collections named tuple is clean, simple, and elegant. This also satisfies the self-documentation requirement, as will be seen below.
 
 Here's a sample of how used:
 
@@ -86,24 +103,6 @@ Using get_field_item - Column 1, db_column_desc: None
 With bad data you get: None
 ```
 
-**Goal:** To build a file record format, for immutable data (once written), that would be transferable between python and other computer languages. Allow for python names like:
-
-1 - Be Textual, allowing for human-readable collection of data that we can access in a really logical manner
-
-2 - Be simple to design, read and write
-
-3 - Be easily converted to an existing built-in python data type
-
-4 - Be self-documenting so that reading the python script would immediately indicate what the data element was.
-
-Solutions:
-  1 Be Textual and use a format understood by other non-python programs. This was easy, JSON already exists and is ready as is.
-
-  2 Be simple to design, read and write – Again easy using a python dictionary structure, in combination with python list for the repeated parts of a record design.
-
-  3, 4  Be easily converted to an existing built-in python data type. Reading JSON into a python collections named tuple is clean, simple, and elegant. This also satisfies the self-documentation requirement, as will be seen below.
-
-
 Before I finished the design, I had a dictionary which contained following components:
 For the purpose of example, I will use the publicly available Australian Exchange Listed Companies file - ASXListedCompanies.csv, and some modules from my soon to be published Stock Market Data engine, which is a set of python scripts designed to be used by game programmers.
 
@@ -156,7 +155,7 @@ The example will contain the following programs:
 
 - ShowData.py - This is used to present some of the ways that the namedtuple data can be used. It imports the ReadRecord script.
 
-
+It is used in the WriteRecord.py example
 
 
 
