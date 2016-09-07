@@ -3,7 +3,7 @@
 
 **Caveat's:** This code was written on MS windows 7 pro. It should run without modification in Linux, but since my Linux box is currently down, hasn't been tested on that OS nor has it been tested on OS-X.
 
-**Goal:** To build a file record format, for immutable data (once written), that would be transferable between python and other computer languages. Allow for python names like:
+**Goal:** To build a file record format, for immutable data (once written), that would be transferable between python and other computer languages (JSON format). Allow for python names like:
 
 **```stkmktrec.dbtabledesc```**
 **```stkmktrec.columns[0].db_column_name```**
@@ -29,134 +29,178 @@ Here's a sample of how used:
 ```
 class ShowData:
     def __init__(self):
-        self.rr = RdRec.ReadRecord('StockData.json')
-        self.stock_market_record = self.rr.read_data_file()
+        self.rec = Record.Record(filename)
+        myrec = self.rec.record
 ```
 
 **To display parts of the record:**
 
 ```
-    def show_data(self):
-        stkmktrec = self.stock_market_record
-        #  get a list of field names:
-        print('Record fields: {}'.format(stkmktrec._fields))
-
-        # List entire record
-        print('\nEntire record: {}'.format(stkmktrec))
-
-        # Get individual field
-        print('\ndbtabledesc: {}'.format(stkmktrec.dbtabledesc))
-
-        # Show database column entries
-        print('\ndatabase column 0: {}'.format(stkmktrec.columns[0]))
-        print('database column 1: {}'.format(stkmktrec.columns[1]))
-        print('database column 2: {}'.format(stkmktrec.columns[2]))
-
-        # Column data by key:
-        for n in range(len(stkmktrec.columns)):
-            column = stkmktrec.columns[n]
-            print('\nColumn {} all: {}'.format(n, column))
-            print('Column data {} field_name: {}'.format(n, column.field_name))
-            print('Column data {} db_column_name: {}'.format(n, column.db_column_name))
-            print('Column data {} db_column_desc: {}'.format(n, column.db_column_desc))
-            print('Column data {} db_column_type: {}'.format(n, column.db_column_type))
-
-        # Using get_field_item
-        print('\nUsing get_field_item - Column 1, db_column_desc: {}'
-              .format(self.rr.get_field_item(1, itemname='db_column_desc')))
-        # same with bad data
-        print('With bad data you get: {}'
-              .format(self.rr.get_field_item(1, itemname='donkykong')))
+        keys = stkrec._asdict().keys()
+        print('\nKeys:')
+        for key in keys:
+            print('\nkey: {}'.format(key))
+            thisrec = getattr(stkrec, key)
+            print('filename: {}'.format(thisrec.filename))
+            print('number of columns: {}'.format(len(thisrec.columns)))
+            print('column 0 column name: {}'.format(thisrec.columns[0].db_column_name))
 ```
 
 Results in:
 ```
-Record fields: ('url', 'dbtablename', 'delimiter', 'notes', 'stk_mkt_filename', 'local_file', 'columns', 'numfields', 'dbtabledesc')
+Keys:
 
-Entire record: data(url='http://www.asx.com.au/asx/research/ASXListedCompanies.csv', dbtablename='ASXListed', delimiter=',', notes="Timestamp first format: 'ASX listed companies as at Sat Aug 13 21:00:02 EST 2016' followed by several empty lines, followed by header format: 'Company name,ASX code,GICS industry group'", stk_mkt_filename='ASXListedCompanies.csv', local_file='/stock_market/data/DailyFiles/USA/ASXListedCompanies.csv', columns=[data(db_column_desc='The company name', field_name='Company name', db_column_type='VARCHAR', db_column_name='CompanyName'), data(db_column_desc='The ASX Code (symbol)', field_name='ASX code', db_column_type='VARCHAR', db_column_name='AsxSymbol'), data(db_column_desc='Name of Industry Group', field_name='GICS industry group', db_column_type='VARCHAR', db_column_name='GicsIndustryGroup')], numfields=3, dbtabledesc='ASX - one of the world’s leading financial market exchanges')
+key: nasdaqlisted
+filename: nasdaqlisted.txt
+number of columns: 8
+column 0 column name: Symbol
 
-dbtabledesc: ASX - one of the world’s leading financial market exchanges
-
-database column 0: data(db_column_desc='The company name', field_name='Company name', db_column_type='VARCHAR', db_column_name='CompanyName')
-database column 1: data(db_column_desc='The ASX Code (symbol)', field_name='ASX code', db_column_type='VARCHAR', db_column_name='AsxSymbol')
-database column 2: data(db_column_desc='Name of Industry Group', field_name='GICS industry group', db_column_type='VARCHAR', db_column_name='GicsIndustryGroup')
-
-Column 0 all: data(db_column_desc='The company name', field_name='Company name', db_column_type='VARCHAR', db_column_name='CompanyName')
-Column data 0 field_name: Company name
-Column data 0 db_column_name: CompanyName
-Column data 0 db_column_desc: The company name
-Column data 0 db_column_type: VARCHAR
-
-Column 1 all: data(db_column_desc='The ASX Code (symbol)', field_name='ASX code', db_column_type='VARCHAR', db_column_name='AsxSymbol')
-Column data 1 field_name: ASX code
-Column data 1 db_column_name: AsxSymbol
-Column data 1 db_column_desc: The ASX Code (symbol)
-Column data 1 db_column_type: VARCHAR
-
-Column 2 all: data(db_column_desc='Name of Industry Group', field_name='GICS industry group', db_column_type='VARCHAR', db_column_name='GicsIndustryGroup')
-Column data 2 field_name: GICS industry group
-Column data 2 db_column_name: GicsIndustryGroup
-Column data 2 db_column_desc: Name of Industry Group
-Column data 2 db_column_type: VARCHAR
-
-Using get_field_item - Column 1, db_column_desc: None
-With bad data you get: None
-```
-
-Before I finished the design, I had a dictionary which contained following components:
-For the purpose of example, I will use the publicly available Australian Exchange Listed Companies file - ASXListedCompanies.csv, and some modules from my soon to be published Stock Market Data engine, which is a set of python scripts designed to be used by game programmers.
+key: ASXListedCompanies
+filename: ASXListedCompanies.csv
+number of columns: 3
+column 0 column name: CompanyName
 
 ```
-{
-    "numfields": 3,
-    "delimiter": ",",
-    "dbtablename": "ASXListed",
-    "stk_mkt_filename": "ASXListedCompanies.csv",
-    "columns": [
-        {
-            "db_column_type": "VARCHAR",
-            "db_column_desc": "The company name",
-            "field_name": "Company name",
-            "db_column_name": "CompanyName"
-        },
-        {
-            "db_column_type": "VARCHAR",
-            "db_column_desc": "The ASX Code (symbol)",
-            "field_name": "ASX code",
-            "db_column_name": "AsxSymbol"
-        },
-        {
-            "db_column_type": "VARCHAR",
-            "db_column_desc": "Name of Industry Group",
-            "field_name": "GICS industry group",
-            "db_column_name": "GicsIndustryGroup"
+
+The sample file can be regenerated by running WriteRecord.py
+It contains two records for stock market data as shown below:
+
+```
+        self.jsonrec = {
+            "ASXListedCompanies": {
+                "filename": "ASXListedCompanies.csv",
+                "source": "ASX",
+                "url": "http://www.asx.com.au/asx/research/ASXListedCompanies.csv",
+                "local_file": "/stock_market/data/DailyFiles/USA/ASXListedCompanies.csv",
+                "notes":
+                    "Timestamp first format: 'ASX listed companies as at Sat Aug 13"
+                    " 21:00:02 EST 2016' followed by several empty lines, followed"
+                    " by header format: 'Company name,ASX code,GICS industry group'",
+                "delimiter": ",",
+                "numfields": 3,
+                "dbtablename": "ASXListed",
+                "dbtabledesc": "ASX - one of the world\u2019s leading financial market exchanges",
+                "columns": [
+                    {
+                        "field_name": "Company name",
+                        "db_column_name": "CompanyName",
+                        "db_column_desc": "The company name",
+                        "db_column_type": "VARCHAR"
+                    },
+                    {
+                        "field_name": "ASX code",
+                        "db_column_name": "AsxSymbol",
+                        "db_column_desc": "The ASX Code (symbol)",
+                        "db_column_type": "VARCHAR"
+                    },
+                    {
+                        "field_name": "GICS industry group",
+                        "db_column_name": "GicsIndustryGroup",
+                        "db_column_desc": "Name of Industry Group",
+                        "db_column_type": "VARCHAR"
+                    }
+                ]
+            },
+            "nasdaqlisted": {
+                "filename": "nasdaqlisted.txt",
+                "source": "NASDAQ",
+                "url": "ftp://ftp.nasdaqtrader.com/symboldirectory/nasdaqlisted.txt",
+                "local_file": "\stock_market\data\DailyFiles\\USA\\nasdaqlisted.txt",
+                "notes":
+                    "Order Must be maintained in header - Use Number key to access"
+                    "The last row of each Symbol Directory text file contains a"
+                    " timestamp that reports the File Creation Time. The file"
+                    " creation time is based on when NASDAQ Trader generates the"
+                    " file and can be used to determine the timeliness of the"
+                    " associated data. The row contains the words File Creation Time"
+                    " followed by mmddyyyyhhmm as the first field, followed by all"
+                    " delimiters to round out the row. An example: File Creation"
+                    " Time: 1217200717:03|||||"
+                    "CreatedDate - 'File Creation Time: MMDDYYYYHR:MN']",
+                "delimiter": "|",
+                "numfields": 8,
+                "dbtablename": "NasdaqListed",
+                "dbtabledesc":
+                    "ASX is one of the world’s leading financial market"
+                    " exchanges, offering a full suite of services,"
+                    " including listings, trading, clearing and settlement,"
+                    " across a comprehensive range of asset classes. As the"
+                    " first major financial market open every day, ASX is a"
+                    " world leader in raising capital, consistently ranking"
+                    " among the top five exchanges globally. With a total"
+                    " market capitalisation of around $1.5 trillion, ASX is"
+                    " home to some of the world’s leading resource, finance"
+                    " and technology companies. Our $47 trillion interest rate"
+                    " derivatives market is the largest in Asia and among the"
+                    " biggest in the world.",
+                "columns": [
+                    {
+                        "field_name": "Symbol",
+                        "db_column_name": "Symbol",
+                        "db_column_desc":
+                            "The one to four or five character identifier for each"
+                            " NASDAQ-listed security.",
+                        "db_column_type": "VARCHAR"
+                    },
+                    {
+                        "field_name": "Security Name",
+                        "db_column_name": "SecurityName",
+                        "db_column_desc": "Company issuing the security.",
+                        "db_column_type": "VARCHAR"
+                    },
+                    {
+                        "field_name": "Market Category",
+                        "db_column_name": "MarketCategory",
+                        "db_column_desc": "The category assigned to the issue by NASDAQ based on Listing Requirements. Values",
+                        "db_column_type": "VARCHAR"
+                    },
+                    {
+                        "field_name": "Test Issue",
+                        "db_column_name": "TestIssue",
+                        "db_column_desc": "Indicates whether or not the security is a test security.",
+                        "db_column_type": "VARCHAR"
+                    },
+                    {
+                        "field_name": "Financial Status",
+                        "db_column_name": "FinancialStatus",
+                        "db_column_desc": "Indicates when an issuer has failed to submit its regulatory filings on a timely basis, has failed to meet NASDAQ's continuing listing standards, and/or has filed for bankruptcy.",
+                        "db_column_type": "VARCHAR"
+                    },
+                    {
+                        "field_name": "Round Lot Size",
+                        "db_column_name": "RoundLotSize",
+                        "db_column_desc": "Indicates the number of shares that make"
+                                          " up a round lot for the given security.",
+                        "db_column_type": "NUMERIC"
+                    },
+                    {
+                        "field_name": "ETF",
+                        "db_column_name": "ETF",
+                        "db_column_desc": "Identifies whether the security is an"
+                                          " exchange traded fund",
+                        "db_column_type": "VARCHAR"
+                    },
+                    {
+                        "field_name": "Next Shares",
+                        "db_column_name": "NextSghares",
+                        "db_column_desc": "",
+                        "db_column_type": "VARCHAR"
+                    }
+                ]
+            }
         }
-    ],
-    "notes": "Timestamp first format: 'ASX listed companies as at
-                   Sat Aug 13 21:00:02 EST 2016' followed by several empty
-                   lines, followed by header format: 'Company name, 
-                   ASX code,GICS industry group'",
-    "url": "http://www.asx.com.au/asx/research/
-              ASXListedCompanies.csv",
-    "dbtabledesc": "ASX - one of the world\u2019s leading financial
-                            market exchanges",
-    "local_file": "/stock_market/data/DailyFiles/USA/
-                        ASXListedCompanies.csv"
-}
 ```
 
-This dictionary structure is perfect for conversion to JSON
+The class contains iter types so that:
+```
+for rec in stkrec:
+    ...
+```
 
-The example will contain the following programs:
+is valid
 
-- WriteRecord.py - This program is a quick and dirty way to create a JSON file which will contain one record for the sample data. Normally this will be replaced by a GUI or otherwise data entry program that would populate and maintain the required fields. It can even come from a manually entered dictionary in a text file.
+The only module needed to use is Record.py.
 
-- ReadRecord.py - Reads the JSON data and converts to namedtuple. This script can be used without knowing the format of the data to be read. This is the 'Ready to use as is', reusable  part of the example code.
+The other python scripts are for creating data and example only.
 
-- ShowData.py - This is used to present some of the ways that the namedtuple data can be used. It imports the ReadRecord script.
-
-It is used in the WriteRecord.py example
-
-
-
-
+The JSON file can be created by web form or whatever.
