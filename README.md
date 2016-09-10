@@ -30,7 +30,7 @@ Here's a sample of how used:
 class ShowData:
     def __init__(self):
         self.rec = Record.Record(filename)
-        myrec = self.rec.record
+        stkrec = self.rec.record
 ```
 
 **To display parts of the record:**
